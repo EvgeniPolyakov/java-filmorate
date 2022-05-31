@@ -55,6 +55,7 @@ public class UserController {
             throw new ValidationException("ID пользователя должен быть больше 0.");
         }
     }
+
     private void fillNameIfBlank(User user) {
         if (user.getName().isEmpty()) {
             user.setName(user.getLogin());
