@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.IdGenerator;
 
@@ -50,11 +51,11 @@ class UserControllerTest {
         controller.create(user1);
         controller.create(user2);
 
-        List<User> testArray = new ArrayList<>();
-        testArray.add(user1);
-        testArray.add(user2);
+        List<User> expected = new ArrayList<>();
+        expected.add(user1);
+        expected.add(user2);
 
-        assertEquals(testArray.toString(), controller.findAll().toString());
+        assertEquals(expected.toString(), controller.findAll().toString());
     }
 
     @Test
@@ -96,7 +97,7 @@ class UserControllerTest {
                 .name("updated name")
                 .build();
 
-        controller.createOrUpdate(userUpdate);
+        controller.update(userUpdate);
         assertNotNull(userUpdate, "Пользователь не найден.");
         assertFalse(controller.findAll().contains(user));
         assertTrue(controller.findAll().contains(userUpdate));
@@ -158,6 +159,32 @@ class UserControllerTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void testUpdateUserWithNegativeID () {
+        User user = User.builder()
+                .name("name")
+                .email("email@email.com")
+                .login("login")
+                .birthday(LocalDate.of(2984, 11, 11))
+                .id(-1)
+                .build();
+
+        assertThrows(ValidationException.class, () -> controller.update(user));
+    }
+
+    @Test
+    void testUpdateUserWithIDZero () {
+        User user = User.builder()
+                .name("name")
+                .email("email@email.com")
+                .login("login")
+                .birthday(LocalDate.of(2984, 11, 11))
+                .id(0)
+                .build();
+
+        assertThrows(ValidationException.class, () -> controller.update(user));
     }
 
     static Stream<Arguments> emailsForCreateUserWithWrongEmailsTest() {

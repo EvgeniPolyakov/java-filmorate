@@ -46,11 +46,11 @@ class FilmControllerTest {
         controller.create(film1);
         controller.create(film2);
 
-        List<Film> testArray = new ArrayList<>();
-        testArray.add(film1);
-        testArray.add(film2);
+        List<Film> expected = new ArrayList<>();
+        expected.add(film1);
+        expected.add(film2);
 
-        assertEquals(testArray.toString(), controller.findAll().toString());
+        assertEquals(expected.toString(), controller.findAll().toString());
     }
 
     @Test
@@ -92,7 +92,7 @@ class FilmControllerTest {
                 .duration(160)
                 .build();
 
-        controller.createOrUpdate(filmUpdate);
+        controller.update(filmUpdate);
         assertNotNull(filmUpdate, "Фильм не найден.");
         assertFalse(controller.findAll().contains(film));
         assertTrue(controller.findAll().contains(filmUpdate));
@@ -190,5 +190,31 @@ class FilmControllerTest {
 
         Set<ConstraintViolation<Film>> violations = validator.validate(film);
         assertFalse(violations.isEmpty());
+    }
+
+    @Test
+    void testUpdateFilmWithNegativeID () {
+        Film film = Film.builder()
+                .name("name")
+                .description("description")
+                .releaseDate(LocalDate.of(1895, 12, 28))
+                .duration(160)
+                .id(-1)
+                .build();
+
+        assertThrows(ValidationException.class, () -> controller.update(film));
+    }
+
+    @Test
+    void testUpdateFilmWithIDZero () {
+        Film film = Film.builder()
+                .name("name")
+                .description("description")
+                .releaseDate(LocalDate.of(1895, 12, 28))
+                .duration(160)
+                .id(0)
+                .build();
+
+        assertThrows(ValidationException.class, () -> controller.update(film));
     }
 }

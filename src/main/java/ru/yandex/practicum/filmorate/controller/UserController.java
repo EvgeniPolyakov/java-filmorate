@@ -24,42 +24,38 @@ public class UserController {
     }
 
     @PostMapping
-    public User create(@Valid @RequestBody User user) throws ValidationException {
-        if (checkLoginContainsWhitespaces(user)) {
-            throw new ValidationException("Ошибка: login содержит пробелы.");
-        }
-        checkNameIsBlank(user);
-        int id = generateId(user);
-        users.put(id, user);
+    public User create(@Valid @RequestBody User user) {
+        generateId(user);
+        validate(user);
+        fillNameIfBlank(user);
+        users.put(user.getId(), user);
         log.debug("Получен запрос POST. Добавлен пользователь: {}. Текущее количество: {}", user, users.size());
         return user;
     }
 
     @PutMapping
-    public User createOrUpdate(@Valid @RequestBody User user) throws ValidationException {
-        if (checkLoginContainsWhitespaces(user)) {
-            throw new ValidationException("Ошибка: login содержит пробелы.");
-        }
-        if (user.getId() < 1) {
-            throw new ValidationException("Указан некорректный id.");
-        }
-        checkNameIsBlank(user);
+    public User update(@Valid @RequestBody User user) {
+        validate(user);
+        fillNameIfBlank(user);
         users.put(user.getId(), user);
         log.debug("Получен запрос PUT. Добавлен пользователь: {}. Текущее количество: {}", user, users.size());
         return user;
     }
 
-    private int generateId(User user) {
+    private void generateId(User user) {
         int newId = IdGenerator.generateUserId();
         user.setId(newId);
-        return newId;
     }
 
-    private boolean checkLoginContainsWhitespaces(User user) {
-        return user.getLogin().contains(" ");
+    private void validate(User user) {
+        if (user.getLogin().contains(" ")) {
+            throw new ValidationException("Имя пользователя не может содержать пробеды.");
+        }
+        if (user.getId() < 1) {
+            throw new ValidationException("ID пользователя должен быть больше 0.");
+        }
     }
-
-    private void checkNameIsBlank(User user) {
+    private void fillNameIfBlank(User user) {
         if (user.getName().isEmpty()) {
             user.setName(user.getLogin());
         }
