@@ -29,7 +29,7 @@ public class UserController {
         validate(user);
         fillNameIfBlank(user);
         users.put(user.getId(), user);
-        log.debug("Получен запрос POST. Добавлен пользователь: {}. Текущее количество: {}", user, users.size());
+        log.debug("Получен запрос POST. Добавлен пользователь: {}. Текущее количество: {}.", user, users.size());
         return user;
     }
 
