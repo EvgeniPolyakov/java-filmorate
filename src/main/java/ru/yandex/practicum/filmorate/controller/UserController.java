@@ -29,7 +29,7 @@ public class UserController {
         validate(user);
         fillNameIfBlank(user);
         users.put(user.getId(), user);
-        log.debug("Получен запрос POST. Добавлен пользователь: {}. Текущее количество: {}", user, users.size());
+        log.debug("Получен запрос POST. Добавлен пользователь: {}. Текущее количество: {}.", user, users.size());
         return user;
     }
 
@@ -55,6 +55,7 @@ public class UserController {
             throw new ValidationException("ID пользователя должен быть больше 0.");
         }
     }
+
     private void fillNameIfBlank(User user) {
         if (user.getName().isEmpty()) {
             user.setName(user.getLogin());
