@@ -8,11 +8,12 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Positive;
 import javax.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.Set;
 
 @Data
 @Builder
 public class Film {
-    private int id;
+    private Long id;
     @NotBlank
     @NotEmpty
     private String name;
@@ -23,5 +24,6 @@ public class Film {
     private LocalDate releaseDate;
     @Positive
     private int duration;
+    private Set<Long> likes;
 
 }
