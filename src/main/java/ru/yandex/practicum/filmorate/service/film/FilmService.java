@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service.film;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
@@ -24,9 +24,7 @@ public class FilmService {
     }
 
     public Film getFilmById(Long id) {
-        if (filmStorage.getFilms().get(id) == null) {
-            throw new ObjectNotFoundException("Фильм не найден.");
-        }
+        validateFilmId(id);
         return filmStorage.getFilms().get(id);
     }
 
@@ -41,10 +39,12 @@ public class FilmService {
     }
 
     public void addLike(Long filmId, Long userId) {
+        validateFilmId(filmId);
         getFilmById(filmId).getLikes().add(userId);
     }
 
     public void removeLike(Long filmId, Long userId) {
+        validateFilmId(filmId);
         getFilmById(filmId).getLikes().remove(userId);
     }
 
@@ -56,7 +56,13 @@ public class FilmService {
                 .collect(Collectors.toList());
     }
 
-    private int compare(Film f0, Film f1) {
-        return f1.getLikes().size() - f0.getLikes().size();
+    private void validateFilmId(Long id) {
+        if (filmStorage.getFilms().get(id) == null) {
+            throw new NotFoundException(String.format("Фильм c id %s не найден.", id));
+        }
+    }
+
+    private int compare(Film film1, Film film2) {
+        return film2.getLikes().size() - film1.getLikes().size();
     }
 }

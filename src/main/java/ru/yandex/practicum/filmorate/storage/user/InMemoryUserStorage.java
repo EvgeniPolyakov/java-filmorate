@@ -1,7 +1,8 @@
 package ru.yandex.practicum.filmorate.storage.user;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.idgenerator.UserIdGenerator;
@@ -14,6 +15,12 @@ import java.util.Map;
 @Component
 public class InMemoryUserStorage implements UserStorage {
     private final Map<Long, User> users = new HashMap<>();
+    private final UserIdGenerator idGenerator;
+
+    @Autowired
+    public InMemoryUserStorage(UserIdGenerator idGenerator) {
+        this.idGenerator = idGenerator;
+    }
 
     public Collection<User> getAllUsers() {
         return users.values();
@@ -30,10 +37,10 @@ public class InMemoryUserStorage implements UserStorage {
 
     public User update(User user) {
         if (user == null) {
-            throw new ObjectNotFoundException("Неверно переданы данные пользователя.");
+            throw new NotFoundException("Неверно переданы данные пользователя.");
         }
         if (!users.containsKey(user.getId())) {
-            throw new ObjectNotFoundException("Пользователь не найден.");
+            throw new NotFoundException("Пользователь не найден.");
         }
         validate(user);
         fillNameIfBlank(user);
@@ -43,7 +50,7 @@ public class InMemoryUserStorage implements UserStorage {
     }
 
     private void generateId(User user) {
-        Long newId = UserIdGenerator.generateUserId();
+        Long newId = idGenerator.generateUserId();
         user.setId(newId);
     }
 

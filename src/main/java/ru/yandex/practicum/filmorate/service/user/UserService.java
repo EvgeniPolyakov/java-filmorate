@@ -2,7 +2,7 @@ package ru.yandex.practicum.filmorate.service.user;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import ru.yandex.practicum.filmorate.exception.ObjectNotFoundException;
+import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
@@ -36,24 +36,20 @@ public class UserService {
     }
 
     public User getUserById(Long id) {
-        if (userStorage.getUsers().get(id) == null) {
-            throw new ObjectNotFoundException("Пользователь не найден.");
-        }
+        validateUserId(id);
         return userStorage.getUsers().get(id);
     }
 
     public void addFriend(Long userId, Long friendId) {
-        if (userStorage.getUsers().get(userId) == null) {
-            throw new ObjectNotFoundException("Пользователь не найден.");
-        }
-        if (userStorage.getUsers().get(friendId) == null) {
-            throw new ObjectNotFoundException("Пользователь не найден.");
-        }
+        validateUserId(userId);
+        validateUserId(friendId);
         getUserById(userId).getFriends().add(friendId);
         getUserById(friendId).getFriends().add(userId);
     }
 
     public void removeFriend(Long userId, Long friendId) {
+        validateUserId(userId);
+        validateUserId(friendId);
         getUserById(userId).getFriends().remove(friendId);
         getUserById(friendId).getFriends().remove(userId);
     }
@@ -74,5 +70,11 @@ public class UserService {
                 .stream()
                 .map(userStorage.getUsers()::get)
                 .collect(Collectors.toList());
+    }
+
+    private void validateUserId(Long id) {
+        if (userStorage.getUsers().get(id) == null) {
+            throw new NotFoundException(String.format("Пользователь c id %s не найден.", id));
+        }
     }
 }

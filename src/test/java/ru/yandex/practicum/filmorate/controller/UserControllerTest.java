@@ -25,7 +25,8 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
-    UserStorage userStorage = new InMemoryUserStorage();
+    UserIdGenerator idGenerator = new UserIdGenerator();
+    UserStorage userStorage = new InMemoryUserStorage(idGenerator);
     UserService userService = new UserService(userStorage);
     UserController controller = new UserController(userService);
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -33,9 +34,9 @@ class UserControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        userStorage = new InMemoryUserStorage();
+        userStorage = new InMemoryUserStorage(idGenerator);
         userService = new UserService(userStorage);
-        UserIdGenerator.setUserBaseId(0L);
+        idGenerator.setUserBaseId(0L);
         controller = new UserController(userService);
     }
 
@@ -165,32 +166,6 @@ class UserControllerTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
-    }
-
-    @Test
-    void testUpdateUserWithNegativeID () {
-        User user = User.builder()
-                .name("name")
-                .email("email@email.com")
-                .login("login")
-                .birthday(LocalDate.of(2984, 11, 11))
-                .id(-1L)
-                .build();
-
-        assertThrows(ValidationException.class, () -> controller.updateUser(user));
-    }
-
-    @Test
-    void testUpdateUserWithIDZero () {
-        User user = User.builder()
-                .name("name")
-                .email("email@email.com")
-                .login("login")
-                .birthday(LocalDate.of(2984, 11, 11))
-                .id(0L)
-                .build();
-
-        assertThrows(ValidationException.class, () -> controller.updateUser(user));
     }
 
     static Stream<Arguments> emailsForCreateUserWithWrongEmailsTest() {

@@ -30,15 +30,13 @@ public class FilmController {
 
     @GetMapping("/{id}")
     public Film getFilm(@PathVariable("id") Long id){
-//        if (id <= 0) {
-//            throw new IncorrectParameterException("id");
-//        }
         return filmService.getFilmById(id);
     }
 
     @GetMapping("/popular")
     public List<Film> getHighlyRatedFilms(
-            @RequestParam(value = "count", defaultValue = "10", required = false) Long count){
+            @RequestParam(value = "count", defaultValue = "10", required = false) Long count
+    ){
         if (count <= 0) {
             throw new IncorrectParameterException("count");
         }
@@ -63,12 +61,6 @@ public class FilmController {
 
     @PutMapping("/{id}/like/{userId}")
     public void addLike(@PathVariable("id") Long filmId, @PathVariable("userId") Long userId) {
-//        if (filmId <= 0) {
-//            throw new IncorrectParameterException("id");
-//        }
-//        if (userId <= 0) {
-//            throw new IncorrectParameterException("userId");
-//        }
         filmService.addLike(filmId, userId);
         log.debug("Получен запрос PUT (addLike). От ользователя {} поставлен лайк к фильму {}"
                 , userId, filmId);

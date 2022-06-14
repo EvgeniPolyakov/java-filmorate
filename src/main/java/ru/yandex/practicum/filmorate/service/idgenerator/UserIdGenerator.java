@@ -1,17 +1,16 @@
 package ru.yandex.practicum.filmorate.service.idgenerator;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class UserIdGenerator {
-    private static Long userBaseId = 0L;
+    private Long userBaseId = 0L;
 
-    private UserIdGenerator () {
-        throw new AssertionError();
-    }
-
-    public static Long generateUserId() {
+    public Long generateUserId() {
         return ++userBaseId;
     }
 
-    public static void setUserBaseId(Long userBaseId) {
-        UserIdGenerator.userBaseId = userBaseId;
+    public void setUserBaseId(Long userBaseId) {
+        this.userBaseId = userBaseId;
     }
 }

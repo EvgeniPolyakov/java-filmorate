@@ -21,7 +21,8 @@ import java.util.Set;
 import static org.junit.jupiter.api.Assertions.*;
 
 class FilmControllerTest {
-    FilmStorage filmStorage = new InMemoryFilmStorage();
+    FilmIdGenerator idGenerator = new FilmIdGenerator();
+    FilmStorage filmStorage = new InMemoryFilmStorage(idGenerator);
     FilmService filmService = new FilmService(filmStorage);
     FilmController controller = new FilmController(filmService);
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
@@ -29,9 +30,9 @@ class FilmControllerTest {
 
     @BeforeEach
     void beforeEach() {
-        filmStorage = new InMemoryFilmStorage();
+        filmStorage = new InMemoryFilmStorage(idGenerator);
         filmService = new FilmService(filmStorage);
-        FilmIdGenerator.setFilmBaseId(0L);
+        idGenerator.setFilmBaseId(0L);
         controller = new FilmController(filmService);
     }
 
@@ -199,29 +200,4 @@ class FilmControllerTest {
         assertFalse(violations.isEmpty());
     }
 
-    @Test
-    void testUpdateFilmWithNegativeID () {
-        Film film = Film.builder()
-                .name("name")
-                .description("description")
-                .releaseDate(LocalDate.of(1895, 12, 28))
-                .duration(160)
-                .id(-1L)
-                .build();
-
-        assertThrows(ValidationException.class, () -> controller.updateFilm(film));
-    }
-
-    @Test
-    void testUpdateFilmWithIDZero () {
-        Film film = Film.builder()
-                .name("name")
-                .description("description")
-                .releaseDate(LocalDate.of(1895, 12, 28))
-                .duration(160)
-                .id(0L)
-                .build();
-
-        assertThrows(ValidationException.class, () -> controller.updateFilm(film));
-    }
 }
