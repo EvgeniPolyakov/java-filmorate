@@ -6,9 +6,11 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
-import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.IdGenerator;
+import ru.yandex.practicum.filmorate.service.idgenerator.UserIdGenerator;
+import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.storage.user.InMemoryUserStorage;
+import ru.yandex.practicum.filmorate.storage.user.UserStorage;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -23,14 +25,19 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.*;
 
 class UserControllerTest {
-    UserController controller = new UserController();
+    UserIdGenerator idGenerator = new UserIdGenerator();
+    UserStorage userStorage = new InMemoryUserStorage(idGenerator);
+    UserService userService = new UserService(userStorage);
+    UserController controller = new UserController(userService);
     ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
     Validator validator = factory.getValidator();
 
     @BeforeEach
     void beforeEach() {
-        IdGenerator.setUserBaseId(0);
-        controller = new UserController();
+        userStorage = new InMemoryUserStorage(idGenerator);
+        userService = new UserService(userStorage);
+        idGenerator.setUserBaseId(0L);
+        controller = new UserController(userService);
     }
 
     @Test
@@ -48,19 +55,19 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1981, 3, 3))
                 .build();
 
-        controller.create(user1);
-        controller.create(user2);
+        controller.createUser(user1);
+        controller.createUser(user2);
 
         List<User> expected = new ArrayList<>();
         expected.add(user1);
         expected.add(user2);
 
-        assertEquals(expected.toString(), controller.findAll().toString());
+        assertEquals(expected.toString(), controller.getAllUsers().toString());
     }
 
     @Test
     void testFindAllWithNoData() {
-        assertTrue(controller.findAll().isEmpty());
+        assertTrue(controller.getAllUsers().isEmpty());
     }
 
     @Test
@@ -72,10 +79,10 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1984, 11, 11))
                 .build();
 
-        controller.create(user);
+        controller.createUser(user);
 
         assertNotNull(user, "Пользователь не найден.");
-        assertTrue(controller.findAll().contains(user));
+        assertTrue(controller.getAllUsers().contains(user));
     }
 
     @Test
@@ -87,20 +94,20 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1984, 11, 11))
                 .build();
 
-        controller.create(user);
+        controller.createUser(user);
 
         User userUpdate = User.builder()
-                .id(1)
+                .id(1L)
                 .email("updatedEmail@email.com")
                 .login("updatedLogin")
                 .birthday(LocalDate.of(1984, 12, 12))
                 .name("updated name")
                 .build();
 
-        controller.update(userUpdate);
+        controller.updateUser(userUpdate);
         assertNotNull(userUpdate, "Пользователь не найден.");
-        assertFalse(controller.findAll().contains(user));
-        assertTrue(controller.findAll().contains(userUpdate));
+        assertFalse(controller.getAllUsers().contains(user));
+        assertTrue(controller.getAllUsers().contains(userUpdate));
     }
 
     @Test
@@ -112,7 +119,7 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1984, 11, 11))
                 .build();
 
-        assertThrows(ValidationException.class, () -> controller.create(user));
+        assertThrows(ValidationException.class, () -> controller.createUser(user));
     }
 
     @Test
@@ -137,7 +144,7 @@ class UserControllerTest {
                 .birthday(LocalDate.of(1984, 11, 11))
                 .build();
 
-        controller.create(user);
+        controller.createUser(user);
         assertEquals(user.getName(), user.getLogin());
     }
 
@@ -159,32 +166,6 @@ class UserControllerTest {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertFalse(violations.isEmpty());
-    }
-
-    @Test
-    void testUpdateUserWithNegativeID () {
-        User user = User.builder()
-                .name("name")
-                .email("email@email.com")
-                .login("login")
-                .birthday(LocalDate.of(2984, 11, 11))
-                .id(-1)
-                .build();
-
-        assertThrows(ValidationException.class, () -> controller.update(user));
-    }
-
-    @Test
-    void testUpdateUserWithIDZero () {
-        User user = User.builder()
-                .name("name")
-                .email("email@email.com")
-                .login("login")
-                .birthday(LocalDate.of(2984, 11, 11))
-                .id(0)
-                .build();
-
-        assertThrows(ValidationException.class, () -> controller.update(user));
     }
 
     static Stream<Arguments> emailsForCreateUserWithWrongEmailsTest() {

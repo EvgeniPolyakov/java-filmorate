@@ -1,57 +1,80 @@
 package ru.yandex.practicum.filmorate.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
+import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.IdGenerator;
+import ru.yandex.practicum.filmorate.service.film.FilmService;
 
 import javax.validation.Valid;
-import java.time.LocalDate;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 @Slf4j
 @RestController
 @RequestMapping("/films")
 public class FilmController {
-    private final Map<Integer, Film> films = new HashMap<>();
+    private final FilmService filmService;
+
+    @Autowired
+    public FilmController(FilmService filmService) {
+        this.filmService = filmService;
+    }
 
     @GetMapping
-    public Collection<Film> findAll() {
+    public Collection<Film> getAllFilms() {
         log.debug("Получен запрос GET /films");
-        return films.values();
+        return filmService.getFilms();
+    }
+
+    @GetMapping("/{id}")
+    public Film getFilm(@PathVariable("id") Long id){
+        return filmService.getFilmById(id);
+    }
+
+    @GetMapping("/popular")
+    public List<Film> getHighlyRatedFilms(
+            @RequestParam(value = "count", defaultValue = "10", required = false) Long count
+    ){
+        if (count <= 0) {
+            throw new IncorrectParameterException("count");
+        }
+        log.debug("Получен запрос GET для /films/popular (getHighlyRatedFilms)");
+        System.out.println(filmService.getHighlyRatedFilms(count));
+        return filmService.getHighlyRatedFilms(count);
     }
 
     @PostMapping
-    public Film create(@Valid @RequestBody Film film) {
-        generateId(film);
-        validate(film);
-        films.put(film.getId(), film);
-        log.debug("Получен запрос POST. Добавлен фильм: {}. Текущее количество: {}", film, films.size());
+    public Film createFilm(@Valid @RequestBody Film film) {
+        filmService.createFilm(film);
+        log.debug("Получен запрос POST. Добавлен фильм: {}", film);
         return film;
     }
 
     @PutMapping
-    public Film update(@Valid @RequestBody Film film) {
-        validate(film);
-        films.put(film.getId(), film);
-        log.debug("Получен запрос PUT. Добавлен фильм: {}. Текущее количество фильмов: {}", film, films.size());
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        filmService.updateFilm(film);
+        log.debug("Получен запрос PUT. Добавлен фильм: {}", film);
         return film;
     }
 
-    private void generateId(Film film) {
-        int newId = IdGenerator.generateFilmId();
-        film.setId(newId);
+    @PutMapping("/{id}/like/{userId}")
+    public void addLike(@PathVariable("id") Long filmId, @PathVariable("userId") Long userId) {
+        filmService.addLike(filmId, userId);
+        log.debug("Получен запрос PUT (addLike). От ользователя {} поставлен лайк к фильму {}"
+                , userId, filmId);
     }
 
-    private void validate(Film film) {
-        if (film.getReleaseDate().isBefore(LocalDate.of(1895, 12, 28))) {
-            throw new ValidationException("Указана некорректная дата выпуска фильма.");
+    @DeleteMapping("/{id}/like/{userId}")
+    public void removeLike(@PathVariable("id") Long filmId, @PathVariable("userId") Long userId) {
+        if (filmId <= 0) {
+            throw new IncorrectParameterException("id");
         }
-        if (film.getId() < 1) {
-            throw new ValidationException("ID фильма должен быть больше 0.");
+        if (userId <= 0) {
+            throw new IncorrectParameterException("userId");
         }
+        filmService.removeLike(filmId, userId);
+        log.debug("Получен запрос DELETE (removeLike). Удален лайк пользофвталея {} к фильму {}", filmId, userId);
     }
 }
