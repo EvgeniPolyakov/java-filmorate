@@ -1,8 +1,8 @@
 package ru.yandex.practicum.filmorate.service.idgenerator;
 
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-@Component
+@Service
 public class UserIdGenerator {
     private Long userBaseId = 0L;
 

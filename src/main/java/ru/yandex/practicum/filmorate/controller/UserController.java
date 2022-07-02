@@ -30,31 +30,18 @@ public class UserController {
 
     @GetMapping("/{id}")
     public User getUser(@PathVariable("id") Long id){
-//        if (id <= 0) {
-//            throw new IncorrectParameterException("id");
-//        }
         log.debug("Получен запрос GET /users по id {}", id);
         return userService.getUserById(id);
     }
 
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable("id") Long id){
-//        if (id <= 0) {
-//            throw new IncorrectParameterException("id");
-//        }
         log.debug("Получен запрос GET /friends для пользователя с id {}", id);
-//        System.out.println(userService.getUsersFriends(userService.getUserById(id)));
         return userService.getUsersFriends(userService.getUserById(id));
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable("id") Long userId, @PathVariable("otherId") Long otherUserId){
-//        if (userId <= 0) {
-//            throw new IncorrectParameterException("userId");
-//        }
-//        if (otherUserId <= 0) {
-//            throw new IncorrectParameterException("otherId");
-//        }
         log.debug("Получен запрос GET (getCommonFriends) для пользователей с id {} и {}", userId, otherUserId);
         return userService.getCommonFriends(userId, otherUserId);
     }
@@ -75,12 +62,6 @@ public class UserController {
 
     @PutMapping("/{id}/friends/{friendId}")
     public void addFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) {
-//        if (userId <= 0) {
-//            throw new IncorrectParameterException("userId");
-//        }
-//        if (friendId <= 0) {
-//            throw new IncorrectParameterException("friendId");
-//        }
         userService.addFriend(userId, friendId);
         log.debug("Получен запрос PUT (addFriend). Пользователь {} добавлен в друзья к пользователю {}"
                 , userId, friendId);

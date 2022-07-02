@@ -44,7 +44,7 @@ public class UserService {
         validateUserId(userId);
         validateUserId(friendId);
         getUserById(userId).getFriends().add(friendId);
-        getUserById(friendId).getFriends().add(userId);
+//        getUserById(friendId).getFriends().add(userId); - убрал автодобавление друга в ответ без подтверждения
     }
 
     public void removeFriend(Long userId, Long friendId) {
@@ -70,6 +70,11 @@ public class UserService {
                 .stream()
                 .map(userStorage.getUsers()::get)
                 .collect(Collectors.toList());
+    }
+
+    public boolean checkIsFriendshipMutual(Long userId, Long friendId) {
+        return getUserById(userId).getFriends().contains(friendId)
+                && getUserById(friendId).getFriends().contains(userId);
     }
 
     private void validateUserId(Long id) {
