@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.service.user.UserService;
+import ru.yandex.practicum.filmorate.service.UserService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -37,7 +37,7 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable("id") Long id){
         log.debug("Получен запрос GET /friends для пользователя с id {}", id);
-        return userService.getUsersFriends(userService.getUserById(id));
+        return userService.getUserFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
@@ -48,16 +48,14 @@ public class UserController {
 
     @PostMapping
     public User createUser(@Valid @RequestBody User user) {
-        userService.createUser(user);
         log.debug("Получен запрос POST (createUser). Добавлен пользователь: {}", user);
-        return user;
+        return userService.createUser(user);
     }
 
     @PutMapping
     public User updateUser(@Valid @RequestBody User user) {
-        userService.updateUser(user);
         log.debug("Получен запрос PUT (updateUser). Добавлен пользователь: {}", user);
-        return user;
+        return userService.updateUser(user);
     }
 
     @PutMapping("/{id}/friends/{friendId}")
@@ -67,6 +65,11 @@ public class UserController {
                 , userId, friendId);
     }
 
+    @DeleteMapping("/{id}")
+    public void removeUser(@PathVariable("id") Long id){
+        log.debug("Получен запрос DELETE /users по id {}", id);
+        userService.deleteUser(id);
+    }
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) {
         if (userId <= 0) {

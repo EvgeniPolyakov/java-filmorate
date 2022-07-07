@@ -1,6 +1,7 @@
-package ru.yandex.practicum.filmorate.service.film;
+package ru.yandex.practicum.filmorate.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
@@ -8,61 +9,52 @@ import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage) {
         this.filmStorage = filmStorage;
     }
 
     public Collection<Film> getFilms() {
-        return filmStorage.getAllFilms();
+        return filmStorage.getFilms();
     }
 
     public Film getFilmById(Long id) {
         validateFilmId(id);
-        return filmStorage.getFilms().get(id);
+        return filmStorage.getFilmById(id);
     }
 
     public Film createFilm(Film film) {
-        filmStorage.create(film);
-        return film;
+        return filmStorage.create(film);
     }
 
     public Film updateFilm(Film film) {
-        filmStorage.update(film);
-        return film;
+        validateFilmId(film.getId());
+        return filmStorage.update(film);
     }
 
     public void addLike(Long filmId, Long userId) {
         validateFilmId(filmId);
-        getFilmById(filmId).getLikes().add(userId);
+        filmStorage.addLike(filmId, userId);
     }
 
     public void removeLike(Long filmId, Long userId) {
         validateFilmId(filmId);
-        getFilmById(filmId).getLikes().remove(userId);
+        filmStorage.removeLike(filmId, userId);
     }
 
     public List<Film> getHighlyRatedFilms(Long count) {
-        return filmStorage.getAllFilms()
-                .stream()
-                .sorted(this::compare)
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.getHighlyRatedFilms(count);
     }
 
     private void validateFilmId(Long id) {
-        if (filmStorage.getFilms().get(id) == null) {
+        if (filmStorage.getFilmById(id) == null) {
             throw new NotFoundException(String.format("Фильм c id %s не найден.", id));
         }
     }
 
-    private int compare(Film film1, Film film2) {
-        return film2.getLikes().size() - film1.getLikes().size();
-    }
 }

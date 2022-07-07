@@ -5,7 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.FilmService;
 
 import javax.validation.Valid;
 import java.util.Collection;
@@ -41,22 +41,19 @@ public class FilmController {
             throw new IncorrectParameterException("count");
         }
         log.debug("Получен запрос GET для /films/popular (getHighlyRatedFilms)");
-        System.out.println(filmService.getHighlyRatedFilms(count));
         return filmService.getHighlyRatedFilms(count);
     }
 
     @PostMapping
     public Film createFilm(@Valid @RequestBody Film film) {
-        filmService.createFilm(film);
         log.debug("Получен запрос POST. Добавлен фильм: {}", film);
-        return film;
+        return filmService.createFilm(film);
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
-        filmService.updateFilm(film);
         log.debug("Получен запрос PUT. Добавлен фильм: {}", film);
-        return film;
+        return filmService.updateFilm(film);
     }
 
     @PutMapping("/{id}/like/{userId}")
