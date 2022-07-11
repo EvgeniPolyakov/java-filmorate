@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,11 +31,13 @@ public class FilmService {
     }
 
     public Film createFilm(Film film) {
+        validateReleaseDate(film);
         return filmStorage.create(film);
     }
 
     public Film updateFilm(Film film) {
         validateFilmId(film.getId());
+        validateReleaseDate(film);
         return filmStorage.update(film);
     }
 
@@ -57,4 +61,9 @@ public class FilmService {
         }
     }
 
+    private void validateReleaseDate(Film film) {
+        if (film.getReleaseDate().toLocalDate().isBefore(LocalDate.of(1895, 12, 28))) {
+            throw new ValidationException("Указана некорректная дата выпуска фильма.");
+        }
+    }
 }

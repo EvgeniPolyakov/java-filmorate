@@ -29,44 +29,46 @@ public class UserService {
     }
 
     public User updateUser(User user) {
-        validateUser(user.getId());
+        validateUserId(user.getId());
+        validateNameAndLogin(user);
         return userStorage.update(user);
     }
 
     public User getUserById(Long id) {
-        validateUser(id);
+        validateUserId(id);
         return userStorage.getUserById(id);
     }
 
     public void deleteUser(Long id) {
-        validateUser(id);
+        validateUserId(id);
         userStorage.deleteUser(id);
     }
 
     public void addFriend(Long userId, Long friendId) {
-        validateUser(userId);
-        validateUser(friendId);
+        validateUserId(userId);
+        validateUserId(friendId);
         userStorage.addFriend(userId, friendId);
     }
 
     public void removeFriend(Long userId, Long friendId) {
-        validateUser(userId);
-        validateUser(friendId);
+        validateUserId(userId);
+        validateUserId(friendId);
         userStorage.removeFriend(userId, friendId);
     }
 
-    public List<User> getUserFriends(Long id) {
-        return userStorage.getFriends(id);
+    public List<User> getFriends(Long userId) {
+        validateUserId(userId);
+        return userStorage.getFriends(userId);
     }
 
     public List<User> getCommonFriends(Long userId, Long otherUserId) {
-        Set<User> userFriends = new HashSet<>(getUserFriends(userId));
-        Set<User> otherUserFriends = new HashSet<>(getUserFriends(otherUserId));
+        Set<User> userFriends = new HashSet<>(getFriends(userId));
+        Set<User> otherUserFriends = new HashSet<>(getFriends(otherUserId));
         userFriends.retainAll(otherUserFriends);
         return new ArrayList<>(userFriends);
     }
 
-    private void validateUser(Long id) {
+    private void validateUserId(Long id) {
         if (userStorage.getUserById(id) == null) {
             throw new NotFoundException(String.format("Пользователь c id %s не найден.", id));
         }

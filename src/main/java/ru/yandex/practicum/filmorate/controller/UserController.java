@@ -3,7 +3,6 @@ package ru.yandex.practicum.filmorate.controller;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.IncorrectParameterException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
 
@@ -37,7 +36,7 @@ public class UserController {
     @GetMapping("/{id}/friends")
     public List<User> getFriends(@PathVariable("id") Long id){
         log.debug("Получен запрос GET /friends для пользователя с id {}", id);
-        return userService.getUserFriends(id);
+        return userService.getFriends(id);
     }
 
     @GetMapping("/{id}/friends/common/{otherId}")
@@ -72,12 +71,6 @@ public class UserController {
     }
     @DeleteMapping("/{id}/friends/{friendId}")
     public void removeFriend(@PathVariable("id") Long userId, @PathVariable("friendId") Long friendId) {
-        if (userId <= 0) {
-            throw new IncorrectParameterException("id");
-        }
-        if (friendId <= 0) {
-            throw new IncorrectParameterException("friendId");
-        }
         userService.removeFriend(userId, friendId);
         log.debug("Получен запрос DELETE (deleteFriend). Пользователь {} удален из друзей у пользователя {}"
                 , userId, friendId);

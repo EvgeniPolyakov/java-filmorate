@@ -12,7 +12,7 @@ public interface GenreStorage {
 
     List<Genre> getAllGenres();
 
-    void setGenres(Long filmId, List<Genre> genres);
+    void assignGenreToFilm(Long filmId, List<Genre> genres);
 
     void deleteGenresByFilm(Long filmId);
 }

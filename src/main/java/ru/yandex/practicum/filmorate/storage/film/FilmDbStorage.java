@@ -69,7 +69,7 @@ public class FilmDbStorage implements FilmStorage {
 
         if (film.getGenres() != null) {
             List<Genre> genres = removeGenreDuplicates(film);
-            genreStorage.setGenres(filmId, genres);
+            genreStorage.assignGenreToFilm(filmId, genres);
         }
 
         return film;
@@ -90,18 +90,10 @@ public class FilmDbStorage implements FilmStorage {
         if (film.getGenres() != null) {
             List<Genre> genres = removeGenreDuplicates(film);
             genreStorage.deleteGenresByFilm(film.getId());
-            genreStorage.setGenres(film.getId(), genres);
+            genreStorage.assignGenreToFilm(film.getId(), genres);
         }
 
         return film;
-    }
-
-    private List<Genre> removeGenreDuplicates(Film film) {
-        film.setGenres(film.getGenres()
-                .stream()
-                .distinct()
-                .collect(Collectors.toList()));
-        return film.getGenres();
     }
 
     @Override
@@ -129,9 +121,23 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
+    public List<Long> getLikes(Long filmId) {
+        String sql = "SELECT USER_ID FROM FILM_LIKES WHERE FILM_ID = ?";
+        return jdbcTemplate.queryForList(sql, Long.class, filmId);
+    }
+
+    @Override
     public void removeLike(Long filmId, Long userId) {
         String sql = "DELETE FROM FILM_LIKES WHERE FILM_ID = ? AND USER_ID =?";
         jdbcTemplate.update(sql, filmId, userId);
+    }
+
+    private List<Genre> removeGenreDuplicates(Film film) {
+        film.setGenres(film.getGenres()
+                .stream()
+                .distinct()
+                .collect(Collectors.toList()));
+        return film.getGenres();
     }
 
     private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
