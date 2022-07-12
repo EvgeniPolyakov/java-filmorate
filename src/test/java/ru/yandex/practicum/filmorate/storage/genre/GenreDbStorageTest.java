@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPARating;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.film.FilmStorage;
 
 import java.sql.Date;
@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:beforeEachTest.sql")
 class GenreDbStorageTest {
     private final GenreStorage genreStorage;
     private final FilmStorage filmStorage;
@@ -32,7 +33,7 @@ class GenreDbStorageTest {
         film.setDescription(String.format("testDescription %s", timestamp));
         film.setReleaseDate(Date.valueOf("2000-01-01"));
         film.setDuration(100);
-        film.setMpa(new MPARating(1L, "G"));
+        film.setMpa(new MpaRating(1L, "G"));
         film.setGenres(List.of(new Genre(1L, "Комедия")));
         return film;
     }
@@ -49,7 +50,6 @@ class GenreDbStorageTest {
     }
 
     @Test
-    @Transactional
     void getGenreByIdTest() {
         assertThat(genreStorage.getGenreById(1L).getName()).isEqualTo("Комедия");
         assertThat(genreStorage.getGenreById(2L).getName()).isEqualTo("Драма");
@@ -60,7 +60,6 @@ class GenreDbStorageTest {
     }
 
     @Test
-    @Transactional
     void getGenresByFilmTest() {
         Film film = createTestFilmEntity();
         filmStorage.create(film);
@@ -69,13 +68,11 @@ class GenreDbStorageTest {
     }
 
     @Test
-    @Transactional
     void getAllGenresTest() {
         assertThat(genreStorage.getAllGenres()).isEqualTo(allGenresList());
     }
 
     @Test
-    @Transactional
     void assignGenreToFilmTest() {
         Film film = createTestFilmEntity();
         filmStorage.create(film);
@@ -86,7 +83,6 @@ class GenreDbStorageTest {
     }
 
     @Test
-    @Transactional
     void deleteGenresByGenreTest() {
         Film film = createTestFilmEntity();
         film.setGenres(List.of(new Genre(1L, "Комедия"), new Genre(6L, "Боевик")));

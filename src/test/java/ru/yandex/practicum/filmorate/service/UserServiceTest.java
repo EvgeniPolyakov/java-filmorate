@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:beforeEachTest.sql")
 class UserServiceTest {
     private final UserStorage userStorage;
     private final UserService userService;
@@ -37,13 +38,11 @@ class UserServiceTest {
     }
 
     @Test
-    @Transactional
     void getUsersTest() {
         assertThat(userService.getUsers().isEmpty());
     }
 
     @Test
-    @Transactional
     void createUserWithEmptyNameTest() {
         User user = createTestUserEntity();
         user.setName("");
@@ -52,7 +51,6 @@ class UserServiceTest {
     }
 
     @Test
-    @Transactional
     void createUserWithLoginContainingWhitespaceTest() {
         User user = createTestUserEntity();
         user.setLogin("test login");
@@ -60,13 +58,11 @@ class UserServiceTest {
     }
 
     @Test
-    @Transactional
     void getUserByIdWithWrongIdTest() {
         assertThrows(NotFoundException.class, () -> userService.getUserById(666L));
     }
 
     @Test
-    @Transactional
     void updateUserWithLoginContainingWhitespaceTest() {
         User user = createTestUserEntity();
         user.setLogin("test login");
@@ -75,7 +71,6 @@ class UserServiceTest {
     }
 
     @Test
-    @Transactional
     void updateUserWithEmptyNameTest() {
         User user = createTestUserEntity();
         user.setName("");
@@ -84,13 +79,11 @@ class UserServiceTest {
     }
 
     @Test
-    @Transactional
     void deleteUserWithWrongIdTest() {
         assertThrows(NotFoundException.class, () -> userService.deleteUser(666L));
     }
 
     @Test
-    @Transactional
     void addFriendTest() {
         User user = userStorage.create(createTestUserEntity());
         assertThrows(NotFoundException.class, () -> userService.addFriend(user.getId(), 666L));
@@ -98,7 +91,6 @@ class UserServiceTest {
     }
 
     @Test
-    @Transactional
     void removeFriendTest() {
         User user = userStorage.create(createTestUserEntity());
         assertThrows(NotFoundException.class, () -> userService.removeFriend(user.getId(), 666L));
@@ -106,12 +98,11 @@ class UserServiceTest {
     }
 
     @Test
-    @Transactional
     void getFriendsTest() {
         assertThrows(NotFoundException.class, () -> userService.getUserById(666L));
     }
+
     @Test
-    @Transactional
     void getCommonFriendsTest() {
         User user1 = userService.createUser(createTestUserEntity());
         User user2 = userService.createUser(createTestUserEntity());

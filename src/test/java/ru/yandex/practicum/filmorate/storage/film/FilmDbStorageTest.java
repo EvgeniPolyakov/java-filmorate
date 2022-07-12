@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPARating;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.user.UserDbStorage;
 
@@ -22,6 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:beforeEachTest.sql")
 class FilmDbStorageTest {
     private final FilmStorage filmStorage;
     private final UserDbStorage userStorage;
@@ -33,7 +34,7 @@ class FilmDbStorageTest {
         film.setDescription(String.format("testDescription %s", timestamp));
         film.setReleaseDate(Date.valueOf("2000-01-01"));
         film.setDuration(100);
-        film.setMpa(new MPARating(1L, "G"));
+        film.setMpa(new MpaRating(1L, "G"));
         film.setGenres(List.of(new Genre(1L, "Комедия")));
         return film;
     }
@@ -49,7 +50,6 @@ class FilmDbStorageTest {
     }
 
     @Test
-    @Transactional
     void getFilmByIdTest() {
         Film film = filmStorage.create(createTestFilmEntity());
         Long filmId = film.getId();
@@ -57,7 +57,6 @@ class FilmDbStorageTest {
     }
 
     @Test
-    @Transactional
     void getFilmsTest() {
         Film film1 = filmStorage.create(createTestFilmEntity());
         Film film2 = filmStorage.create(createTestFilmEntity());
@@ -67,7 +66,6 @@ class FilmDbStorageTest {
     }
 
     @Test
-    @Transactional
     void createTest() {
         Film film = filmStorage.create(createTestFilmEntity());
         Collection<Film> allFilms = filmStorage.getFilms();
@@ -76,7 +74,6 @@ class FilmDbStorageTest {
     }
 
     @Test
-    @Transactional
     void updateTest() {
         Film film = filmStorage.create(createTestFilmEntity());
         film.setName("updatedTestName");
@@ -94,7 +91,6 @@ class FilmDbStorageTest {
     }
 
     @Test
-    @Transactional
     void deleteFilmTest() {
         Film film = filmStorage.create(createTestFilmEntity());
         Long filmId = film.getId();
@@ -104,7 +100,6 @@ class FilmDbStorageTest {
     }
 
     @Test
-    @Transactional
     void getHighlyRatedFilmsTest() {
         Film film1 = filmStorage.create(createTestFilmEntity());
         Film film2 = filmStorage.create(createTestFilmEntity());
@@ -114,7 +109,6 @@ class FilmDbStorageTest {
     }
 
     @Test
-    @Transactional
     void addAndGetLikeTest() {
         Film film = filmStorage.create(createTestFilmEntity());
         Long filmId = film.getId();
@@ -126,7 +120,6 @@ class FilmDbStorageTest {
     }
 
     @Test
-    @Transactional
     void removeLikeTest() {
         Film film = filmStorage.create(createTestFilmEntity());
         Long filmId = film.getId();

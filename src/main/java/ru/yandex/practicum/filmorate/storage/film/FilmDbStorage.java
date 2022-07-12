@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.model.MPARating;
+import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.genre.GenreStorage;
 
 import java.sql.Date;
@@ -146,7 +146,7 @@ public class FilmDbStorage implements FilmStorage {
         String description = rs.getString("DESCRIPTION");
         Date releaseDate = rs.getDate("RELEASE_DATE");
         int duration = rs.getInt("DURATION");
-        MPARating mpa = new MPARating(rs.getLong("MPA_RATING_ID"), rs.getString("RATING_VALUE"));
+        MpaRating mpa = new MpaRating(rs.getLong("MPA_RATING_ID"), rs.getString("RATING_VALUE"));
         List<Genre> genre = genreStorage.getGenresByFilm(id);
         return new Film(id, name, description, releaseDate, duration, mpa, genre);
     }

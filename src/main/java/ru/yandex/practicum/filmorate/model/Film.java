@@ -26,6 +26,6 @@ public class Film {
     private Date releaseDate;
     @Positive
     private int duration;
-    private MPARating mpa;
+    private MpaRating mpa;
     private List<Genre> genres;
 }

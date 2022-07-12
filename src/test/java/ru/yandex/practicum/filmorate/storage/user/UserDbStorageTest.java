@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
+import org.springframework.test.context.jdbc.Sql;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.sql.Date;
@@ -17,6 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
+@Sql(executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD, scripts = "classpath:beforeEachTest.sql")
 class UserDbStorageTest {
     private final UserDbStorage userStorage;
 
@@ -31,7 +32,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     public void findUserByIdTest() {
         User user = userStorage.create(createTestUserEntity());
         Long userId = user.getId();
@@ -39,7 +39,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     void getAllUsersTest() {
         User user1 = userStorage.create(createTestUserEntity());
         User user2 = userStorage.create(createTestUserEntity());
@@ -49,7 +48,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     void createTest() {
         User user = userStorage.create(createTestUserEntity());
         Collection<User> allUsers = userStorage.getAllUsers();
@@ -58,7 +56,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     void updateTest() {
         User user = userStorage.create(createTestUserEntity());
         user.setLogin("updatedLogin");
@@ -76,7 +73,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     void deleteUserTest() {
         User user = userStorage.create(createTestUserEntity());
         Long userId = user.getId();
@@ -86,7 +82,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     void addAndGetFriendsTest() {
         User user = userStorage.create(createTestUserEntity());
         Long userId = user.getId();
@@ -99,7 +94,6 @@ class UserDbStorageTest {
     }
 
     @Test
-    @Transactional
     void removeFriendTest() {
         User user = userStorage.create(createTestUserEntity());
         Long userId = user.getId();
