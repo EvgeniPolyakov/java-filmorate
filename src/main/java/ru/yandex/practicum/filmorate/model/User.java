@@ -1,14 +1,15 @@
 package ru.yandex.practicum.filmorate.model;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.*;
-import java.time.LocalDate;
-import java.util.Set;
+import java.sql.Date;
 
 @Data
-@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 public class User {
     private Long id;
     @NotBlank
@@ -21,7 +22,5 @@ public class User {
     @NotNull
     private String name;
     @PastOrPresent
-    private LocalDate birthday;
-    private Set<Long> friends;
-
+    private Date birthday;
 }
