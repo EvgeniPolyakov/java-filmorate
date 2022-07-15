@@ -23,6 +23,14 @@ public class FilmDbStorage implements FilmStorage {
     private final JdbcTemplate jdbcTemplate;
     private final GenreStorage genreStorage;
 
+    private static final String FIELD_ID_FIELD = "FILM_ID";
+    private static final String FILM_NAME_FIELD = "FILM_NAME";
+    private static final String DESCRIPTION_FIELD = "DESCRIPTION";
+    private static final String RELEASE_DATE_FIELD = "RELEASE_DATE";
+    private static final String DURATION_FIELD = "DURATION";
+    private static final String MPA_RATING_ID_FIELD = "MPA_RATING_ID";
+    private static final String MPA_RATING_VALUE_FIELD = "RATING_VALUE";
+
     public FilmDbStorage(JdbcTemplate jdbcTemplate, GenreStorage genreStorage) {
         this.jdbcTemplate = jdbcTemplate;
         this.genreStorage = genreStorage;
@@ -141,12 +149,12 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private Film makeFilm(ResultSet rs, int rowNum) throws SQLException {
-        Long id = rs.getLong("FILM_ID");
-        String name = rs.getString("FILM_NAME");
-        String description = rs.getString("DESCRIPTION");
-        Date releaseDate = rs.getDate("RELEASE_DATE");
-        int duration = rs.getInt("DURATION");
-        MpaRating mpa = new MpaRating(rs.getLong("MPA_RATING_ID"), rs.getString("RATING_VALUE"));
+        Long id = rs.getLong(FIELD_ID_FIELD);
+        String name = rs.getString(FILM_NAME_FIELD);
+        String description = rs.getString(DESCRIPTION_FIELD);
+        Date releaseDate = rs.getDate(RELEASE_DATE_FIELD);
+        int duration = rs.getInt(DURATION_FIELD);
+        MpaRating mpa = new MpaRating(rs.getLong(MPA_RATING_ID_FIELD), rs.getString(MPA_RATING_VALUE_FIELD));
         List<Genre> genre = genreStorage.getGenresByFilm(id);
         return new Film(id, name, description, releaseDate, duration, mpa, genre);
     }

@@ -13,6 +13,9 @@ import java.util.List;
 public class MpaDbStorage implements MpaStorage {
     private final JdbcTemplate jdbcTemplate;
 
+    private static final String RATING_ID_FIELD = "RATING_ID";
+    private static final String RATING_VALUE_FIELD = "RATING_VALUE";
+
     public MpaDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -33,8 +36,8 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     private MpaRating makeMpa(ResultSet rs, int rowNum) throws SQLException {
-        Long id = rs.getLong("RATING_ID");
-        String rating = rs.getString("RATING_VALUE");
+        Long id = rs.getLong(RATING_ID_FIELD);
+        String rating = rs.getString(RATING_VALUE_FIELD);
         return new MpaRating(id, rating);
     }
 }

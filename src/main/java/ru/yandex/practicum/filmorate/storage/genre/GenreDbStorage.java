@@ -13,6 +13,9 @@ import java.util.List;
 public class GenreDbStorage implements GenreStorage {
     private final JdbcTemplate jdbcTemplate;
 
+    private static final String GENRE_ID_FIELD = "GENRE_ID";
+    private static final String GENRE_NAME_FIELD = "GENRE";
+
     public GenreDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -52,8 +55,8 @@ public class GenreDbStorage implements GenreStorage {
     }
 
     private Genre makeGenre(ResultSet rs, int RowNum) throws SQLException {
-        Long id = rs.getLong("GENRE_ID");
-        String name = rs.getString("GENRE");
+        Long id = rs.getLong(GENRE_ID_FIELD);
+        String name = rs.getString(GENRE_NAME_FIELD);
         return new Genre(id, name);
     }
 }

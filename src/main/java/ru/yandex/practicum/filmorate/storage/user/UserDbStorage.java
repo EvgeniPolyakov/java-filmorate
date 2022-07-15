@@ -16,6 +16,12 @@ import java.util.stream.Collectors;
 public class UserDbStorage implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
 
+    private static final String USER_ID_FIELD = "USER_ID";
+    private static final String USER_EMAIL_FIELD = "USER_EMAIL";
+    private static final String USER_LOGIN_FIELD = "USER_LOGIN";
+    private static final String USER_NAME_FIELD = "USER_NAME";
+    private static final String BIRTHDATE_FIELD = "BIRTHDATE";
+
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
     }
@@ -97,11 +103,11 @@ public class UserDbStorage implements UserStorage {
     }
 
     private User makeUser(ResultSet rs, int rowNum) throws SQLException {
-        Long id = rs.getLong("USER_ID");
-        String email = rs.getString("USER_EMAIL");
-        String login = rs.getString("USER_LOGIN");
-        String name = rs.getString("USER_NAME");
-        Date birthday = rs.getDate("BIRTHDATE");
+        Long id = rs.getLong(USER_ID_FIELD);
+        String email = rs.getString(USER_EMAIL_FIELD);
+        String login = rs.getString(USER_LOGIN_FIELD);
+        String name = rs.getString(USER_NAME_FIELD);
+        Date birthday = rs.getDate(BIRTHDATE_FIELD);
         return new User(id, email, login, name, birthday);
     }
 }
