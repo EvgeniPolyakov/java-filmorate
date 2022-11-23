@@ -1,6 +1,13 @@
-# java-filmorate
-Template repository for Filmorate project.
+<h1 align="center">
+Filmorate (pet project)
+</h1>
 
-## **Схема базы данных:**
+'Filmorate' is a test project at [Yandex.Practicum](https://practicum.yandex.ru) platform.
+It represents back-end logics for movie fans social network. App logic is covered by unit tests. 
+Movies are stored by genres and contain MPA rating. Users can rate movies and get most rated ones.
 
-![This is an image](https://i.im.ge/2022/07/10/upAq8F.png)
+## Tech stack:
+Spring Boot, Maven, Hibernate, Lombok, PostgreSQL, JUnit
+
+## Launch:
+App can be launched by building a project through Maven and running a .jar file.
